@@ -302,8 +302,13 @@ section { position: relative; z-index: 2; }
 .about__portrait-inner {
   aspect-ratio: 3 / 4;
   border-radius: 10px;
+  overflow: hidden;
   transform: rotate(-2deg);
   transition: transform 0.5s var(--ease-out);
+}
+.about__portrait-inner img {
+  width: 100%; height: 100%;
+  object-fit: cover;
 }
 .about__portrait:hover .about__portrait-inner { transform: rotate(0deg) scale(1.02); }
 .about__portrait-caption {
