@@ -1,4 +1,4 @@
-/* Sean Salazar — kinetic animations (GSAP + ScrollTrigger) */
+/* Sean Salazar — kinetic animations (Lenis + GSAP + ScrollTrigger) */
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -17,7 +17,7 @@ document.querySelectorAll("[data-split]").forEach((el) => {
   }
 });
 
-/* Timecode ticker — fake running film timecode in the hero frame */
+/* Timecode ticker — running film timecode in the hero frame */
 const timecodeEl = document.getElementById("timecode");
 let frames = 0;
 setInterval(() => {
@@ -31,7 +31,8 @@ setInterval(() => {
 }, 1000 / 24);
 
 /* Cursor spotlight */
-if (!reduceMotion && window.matchMedia("(pointer: fine)").matches) {
+const finePointer = window.matchMedia("(pointer: fine)").matches;
+if (!reduceMotion && finePointer) {
   const spot = document.querySelector(".spotlight");
   window.addEventListener("pointermove", (e) => {
     spot.style.setProperty("--spot-x", e.clientX + "px");
@@ -67,6 +68,26 @@ if (reduceMotion || typeof gsap === "undefined") {
 } else {
   gsap.registerPlugin(ScrollTrigger);
 
+  /* ---- Lenis smooth scroll, driven by GSAP's ticker ---- */
+  let lenis = null;
+  if (typeof Lenis !== "undefined") {
+    lenis = new Lenis({ duration: 1.15 });
+    lenis.on("scroll", ScrollTrigger.update);
+    gsap.ticker.add((t) => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+
+    /* Anchor links scroll through Lenis so they stay buttery */
+    document.querySelectorAll('a[href^="#"]').forEach((a) => {
+      a.addEventListener("click", (e) => {
+        const target = document.querySelector(a.getAttribute("href"));
+        if (target) {
+          e.preventDefault();
+          lenis.scrollTo(target, { offset: -90 });
+        }
+      });
+    });
+  }
+
   /* ---- Preloader: count 0→100, then curtain up ---- */
   const countEl = document.getElementById("preloaderCount");
   const counter = { v: 0 };
@@ -99,9 +120,8 @@ if (reduceMotion || typeof gsap === "undefined") {
     }, "-=0.65")
     .from(".hero__eyebrow", { opacity: 0, y: -16, duration: 0.5 }, "-=0.5")
     .from(".hero__sub", { opacity: 0, y: 24, duration: 0.6 }, "-=0.35")
-    .from(".hero__tag", { opacity: 0, duration: 0.6 }, "-=0.25")
+    .from(".hero__actions .btn", { opacity: 0, y: 24, duration: 0.6, stagger: 0.1 }, "-=0.3")
     .from(".hero__frame", { opacity: 0, scale: 1.04, duration: 0.8 }, "-=0.5")
-    .from(".hero__scrollcue", { opacity: 0, duration: 0.6 }, "-=0.3")
     .add(revealNav, "-=0.6");
 
   /* ---- Hero parallax: title drifts up + fades as you scroll past ---- */
@@ -110,6 +130,20 @@ if (reduceMotion || typeof gsap === "undefined") {
     opacity: 0.25,
     ease: "none",
     scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true },
+  });
+
+  /* ---- Masked title reveals: headlines wipe up from a clip ---- */
+  document.querySelectorAll("[data-title]").forEach((el) => {
+    gsap.fromTo(el,
+      { clipPath: "inset(0 0 100% 0)", y: 46 },
+      {
+        clipPath: "inset(0 0 -12% 0)",
+        y: 0,
+        duration: 1.1,
+        ease: "power4.out",
+        scrollTrigger: { trigger: el, start: "top 85%" },
+      }
+    );
   });
 
   /* ---- Generic scroll reveals ---- */
@@ -153,6 +187,25 @@ if (reduceMotion || typeof gsap === "undefined") {
     });
   });
 
+  /* ---- Marquee: skews with scroll velocity, like tape catching speed ---- */
+  const skewSetter = gsap.quickSetter(".marquee__track", "skewX", "deg");
+  const skewProxy = { v: 0 };
+  ScrollTrigger.create({
+    onUpdate: (self) => {
+      const skew = gsap.utils.clamp(-8, 8, self.getVelocity() / -350);
+      if (Math.abs(skew) > Math.abs(skewProxy.v)) {
+        skewProxy.v = skew;
+        gsap.to(skewProxy, {
+          v: 0,
+          duration: 0.9,
+          ease: "power3.out",
+          overwrite: true,
+          onUpdate: () => skewSetter(skewProxy.v),
+        });
+      }
+    },
+  });
+
   /* ---- Dance ghost text: slides horizontally with scroll ---- */
   gsap.fromTo(".dance__bg",
     { xPercent: -58 },
@@ -163,6 +216,25 @@ if (reduceMotion || typeof gsap === "undefined") {
     }
   );
 
+  /* ---- Dance stills: gentle counter-parallax drift ---- */
+  gsap.utils.toArray(".dance__still").forEach((el, i) => {
+    gsap.to(el, {
+      yPercent: i % 2 ? 9 : -9,
+      ease: "none",
+      scrollTrigger: { trigger: ".dance__strip", start: "top bottom", end: "bottom top", scrub: true },
+    });
+  });
+
+  /* ---- Credits roll: names rise in sequence ---- */
+  gsap.from(".credits__list li", {
+    y: 64,
+    opacity: 0,
+    duration: 0.9,
+    stagger: 0.08,
+    ease: "power4.out",
+    scrollTrigger: { trigger: ".credits__list", start: "top 85%" },
+  });
+
   /* ---- Contact CTA letters rise on scroll into view ---- */
   gsap.from(".contact__cta .ch", {
     yPercent: 110,
@@ -172,6 +244,27 @@ if (reduceMotion || typeof gsap === "undefined") {
     ease: "power4.out",
     scrollTrigger: { trigger: ".contact", start: "top 70%" },
   });
+
+  /* ---- Magnetic buttons: pull toward the cursor, spring back ---- */
+  if (finePointer) {
+    document.querySelectorAll("[data-magnetic]").forEach((btn) => {
+      const strength = 26;
+      btn.addEventListener("pointermove", (e) => {
+        const r = btn.getBoundingClientRect();
+        const x = e.clientX - r.left - r.width / 2;
+        const y = e.clientY - r.top - r.height / 2;
+        gsap.to(btn, {
+          x: (x / r.width) * strength,
+          y: (y / r.height) * strength,
+          duration: 0.4,
+          ease: "power3.out",
+        });
+      });
+      btn.addEventListener("pointerleave", () => {
+        gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.4)" });
+      });
+    });
+  }
 
   /* IG embeds resize after load — keep trigger positions accurate */
   window.addEventListener("load", () => {
