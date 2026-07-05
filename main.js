@@ -40,6 +40,72 @@ if (!reduceMotion && finePointer) {
   }, { passive: true });
 }
 
+/* ---- YouTube click-to-play facades: thumbnail + play, iframe only on demand ---- */
+document.querySelectorAll(".yt[data-yt]").forEach((box) => {
+  const id = box.dataset.yt;
+  const title = box.dataset.ytTitle || "Play video";
+
+  const img = document.createElement("img");
+  img.src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+  img.alt = title;
+  img.loading = "lazy";
+
+  const play = document.createElement("button");
+  play.className = "yt__play";
+  play.setAttribute("aria-label", `Play: ${title}`);
+  play.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.8v16.4c0 .9 1 1.5 1.8 1L21 12.9c.8-.5.8-1.6 0-2.1L7.8 2.7C7 2.3 6 2.9 6 3.8Z"/></svg>';
+
+  box.append(img, play);
+
+  box.addEventListener("click", () => {
+    if (box.querySelector("iframe")) return;
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+    iframe.title = title;
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    iframe.allowFullscreen = true;
+    box.replaceChildren(iframe);
+  });
+});
+
+/* Restore a facade (used when an accordion closes, so audio stops) */
+function resetFacade(box) {
+  if (!box || !box.querySelector("iframe")) return;
+  box.replaceChildren();
+  const id = box.dataset.yt;
+  const title = box.dataset.ytTitle || "Play video";
+  const img = document.createElement("img");
+  img.src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+  img.alt = title;
+  const play = document.createElement("button");
+  play.className = "yt__play";
+  play.setAttribute("aria-label", `Play: ${title}`);
+  play.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.8v16.4c0 .9 1 1.5 1.8 1L21 12.9c.8-.5.8-1.6 0-2.1L7.8 2.7C7 2.3 6 2.9 6 3.8Z"/></svg>';
+  box.append(img, play);
+}
+
+/* ---- Style accordion: one look open at a time ---- */
+const styleCards = document.querySelectorAll(".style-card");
+styleCards.forEach((card) => {
+  const head = card.querySelector(".style-card__head");
+  head.addEventListener("click", () => {
+    const isOpen = card.classList.contains("is-open");
+    styleCards.forEach((c) => {
+      if (c !== card && c.classList.contains("is-open")) {
+        c.classList.remove("is-open");
+        c.querySelector(".style-card__head").setAttribute("aria-expanded", "false");
+        resetFacade(c.querySelector(".yt"));
+      }
+    });
+    card.classList.toggle("is-open", !isOpen);
+    head.setAttribute("aria-expanded", String(!isOpen));
+    if (isOpen) resetFacade(card.querySelector(".yt"));
+    if (typeof ScrollTrigger !== "undefined") {
+      setTimeout(() => ScrollTrigger.refresh(), 650);
+    }
+  });
+});
+
 const preloader = document.getElementById("preloader");
 const nav = document.getElementById("nav");
 
