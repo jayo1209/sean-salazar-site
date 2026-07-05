@@ -162,12 +162,16 @@ styleCards.forEach((card) => {
   recalc();
 
   /* Copy a ready-to-send booking summary, then let the DM link open as normal */
+  const TOAST_DEFAULT = "Tap to copy these details, then paste them into the DM.";
   function showToast() {
     if (!toastEl) return;
-    toastEl.textContent = "Copied. Paste it into the chat.";
+    toastEl.textContent = "Copied! Paste it into the chat.";
     toastEl.classList.add("is-visible");
     clearTimeout(toastEl._hideTimer);
-    toastEl._hideTimer = setTimeout(() => toastEl.classList.remove("is-visible"), 4000);
+    toastEl._hideTimer = setTimeout(() => {
+      toastEl.classList.remove("is-visible");
+      toastEl.textContent = TOAST_DEFAULT;
+    }, 4000);
   }
 
   function legacyCopy(text) {
