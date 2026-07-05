@@ -614,15 +614,15 @@ section { position: relative; z-index: 2; }
   margin-bottom: 2.8rem;
 }
 .credits__list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
-.credits__list li {
+.credits__list a {
+  display: inline-block;
   font-family: var(--display);
   font-size: clamp(2.2rem, 6vw, 4.5rem);
   line-height: 1.05;
   color: var(--paper-dim);
   transition: color 0.3s ease, letter-spacing 0.5s var(--ease-out);
-  cursor: default;
 }
-.credits__list li:hover { color: var(--gold-bright); letter-spacing: 0.06em; }
+.credits__list a:hover { color: var(--gold-bright); letter-spacing: 0.06em; }
 
 /* ---------- contact ---------- */
 .contact {
