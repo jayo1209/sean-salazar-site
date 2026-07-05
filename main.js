@@ -106,6 +106,55 @@ styleCards.forEach((card) => {
   });
 });
 
+/* ---- Pricing calculator ---- */
+(function () {
+  const btsToggle = document.getElementById("btsToggle");
+  const zoneInputs = document.querySelectorAll('input[name="zone"]');
+  const milesWrap = document.getElementById("milesWrap");
+  const milesInput = document.getElementById("milesInput");
+  const linesEl = document.getElementById("calcLines");
+  const totalEl = document.getElementById("calcTotal");
+  if (!btsToggle || !linesEl || !totalEl) return;
+
+  const BASE = 180;
+  const BTS = 60;
+  const RATE_PER_MILE = 0.7;
+
+  function currentZone() {
+    return [...zoneInputs].find((r) => r.checked)?.value || "local";
+  }
+
+  function recalc() {
+    const zone = currentZone();
+    milesWrap.hidden = zone !== "other";
+
+    const lines = [`Class filming <b>$${BASE}</b>`];
+    let total = BASE;
+
+    if (btsToggle.checked) {
+      lines.push(`BTS coverage <b>+$${BTS}</b>`);
+      total += BTS;
+    }
+
+    if (zone === "other") {
+      const miles = Math.max(0, Number(milesInput.value) || 0);
+      const travelFee = Math.round(miles * 2 * RATE_PER_MILE);
+      lines.push(`Travel, ${miles} mi roundtrip <b>+$${travelFee}</b>`);
+      total += travelFee;
+    } else {
+      lines.push(`Travel, local area <b>$0</b>`);
+    }
+
+    linesEl.innerHTML = lines.map((l) => `<span>${l}</span>`).join("");
+    totalEl.textContent = `$${total}`;
+  }
+
+  btsToggle.addEventListener("change", recalc);
+  zoneInputs.forEach((r) => r.addEventListener("change", recalc));
+  milesInput?.addEventListener("input", recalc);
+  recalc();
+})();
+
 const preloader = document.getElementById("preloader");
 const nav = document.getElementById("nav");
 

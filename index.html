@@ -36,6 +36,7 @@
       <a href="#styles">Styles</a>
       <a href="#work">Work</a>
       <a href="#dance">Dance</a>
+      <a href="#pricing">Pricing</a>
       <a class="nav__cta" href="https://ig.me/m/seansalazar.booking" target="_blank" rel="noopener" data-magnetic>Book a shoot</a>
     </nav>
   </header>
@@ -346,6 +347,94 @@
       </ul>
     </section>
 
+    <!-- ============ PRICING ============ -->
+    <section class="pricing" id="pricing">
+      <div class="section-head">
+        <h2 class="section-head__title" data-title>CLASS FILMING<br><em>RATES</em></h2>
+        <p class="section-head__note" data-reveal>Cinematic visuals. Purpose driven. Built for dancers.</p>
+      </div>
+
+      <div class="pricing__layout">
+        <div class="calc" data-reveal>
+          <div class="calc__base">
+            <span class="calc__base-label">FLAT RATE</span>
+            <span class="calc__base-price">$180</span>
+            <span class="calc__base-note">Class filming, one visual concept</span>
+          </div>
+
+          <div class="calc__row">
+            <label class="calc__toggle">
+              <input type="checkbox" id="btsToggle">
+              <span class="calc__toggle-track" aria-hidden="true"></span>
+              <span class="calc__toggle-text">
+                <span class="calc__toggle-title">Add BTS coverage</span>
+                <span class="calc__toggle-sub">Behind-the-scenes footage of the shoot</span>
+              </span>
+              <span class="calc__toggle-price">+$60</span>
+            </label>
+          </div>
+
+          <fieldset class="calc__zone">
+            <legend>Filming location</legend>
+            <label class="calc__radio">
+              <input type="radio" name="zone" value="local" checked>
+              <span>Hayward, Fremont, or San Jose</span>
+              <span class="calc__radio-tag">FREE</span>
+            </label>
+            <label class="calc__radio">
+              <input type="radio" name="zone" value="other">
+              <span>Somewhere else</span>
+              <span class="calc__radio-tag calc__radio-tag--muted">$0.70/mi</span>
+            </label>
+            <div class="calc__miles" id="milesWrap" hidden>
+              <label for="milesInput">One-way distance from Hayward, CA (miles)</label>
+              <input type="number" id="milesInput" min="0" step="1" value="20" inputmode="numeric">
+            </div>
+          </fieldset>
+
+          <div class="calc__total" aria-live="polite">
+            <div class="calc__total-lines" id="calcLines">
+              <span>Class filming <b>$180</b></span>
+            </div>
+            <div class="calc__total-sum">
+              <span>ESTIMATED TOTAL</span>
+              <span class="calc__total-amount" id="calcTotal">$180</span>
+            </div>
+            <a class="btn btn--solid calc__cta" href="https://ig.me/m/seansalazar.booking" target="_blank" rel="noopener" data-magnetic>BOOK THIS SHOOT</a>
+            <p class="calc__disclaimer">Estimate only. Final quote confirmed over DM.</p>
+          </div>
+        </div>
+
+        <ul class="reasons">
+          <li data-reveal>
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="6.5" width="14" height="11" rx="2"/><path d="M16.5 10.2 21.5 7v10l-5-3.2Z"/></svg>
+            <h3>Cinematic quality</h3>
+            <p>High-end gear and professional results.</p>
+          </li>
+          <li data-reveal>
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="5.5" r="2.3"/><path d="M12 8v6l-4.5 6M12 14l4.5 6M7.5 12 12 8l4.5 4"/></svg>
+            <h3>Dancer focused</h3>
+            <p>Understands the vision and the movement.</p>
+          </li>
+          <li data-reveal>
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/></svg>
+            <h3>Creative concepts</h3>
+            <p>Visuals tailored to your specific style.</p>
+          </li>
+          <li data-reveal>
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+            <h3>On time delivery</h3>
+            <p>Fast turnaround without cutting corners.</p>
+          </li>
+          <li data-reveal>
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 12.5 6 9l3 2 3-2.5L15 10l3-3 3.5 3.5M4 13l3 3.5a2 2 0 0 0 3 0l.3-.4a1.6 1.6 0 0 1 2.3 0l.3.3a2 2 0 0 0 3 0L19 13"/></svg>
+            <h3>Easy to work with</h3>
+            <p>Professional, respectful, and reliable.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
     <!-- ============ CONTACT ============ -->
     <section class="contact" id="contact">
       <p class="contact__kicker" data-reveal>GOT A VISION?</p>
@@ -367,6 +456,14 @@
         <a href="https://linktr.ee/seansalazar" target="_blank" rel="noopener" aria-label="Linktree">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v7.5M12 21v-4.5M6.5 6.5 12 10.5l5.5-4M4 12h16"/></svg>
           <span>LINKTREE</span>
+        </a>
+        <a href="mailto:seannicosalazar@gmail.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M3.5 6 12 12.5 20.5 6"/></svg>
+          <span>EMAIL</span>
+        </a>
+        <a href="tel:+15102277670" aria-label="Call (510) 227-7670">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4h3.2l1.3 4.5-2 1.6a13 13 0 0 0 6.4 6.4l1.6-2 4.5 1.3V19a2 2 0 0 1-2.2 2A17 17 0 0 1 3 6.2 2 2 0 0 1 5 4Z"/></svg>
+          <span>PHONE</span>
         </a>
       </div>
     </section>
