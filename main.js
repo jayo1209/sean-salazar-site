@@ -106,42 +106,105 @@ styleCards.forEach((card) => {
   });
 });
 
-/* ---- Pricing calculator ---- */
+/* ---- Pricing calculator (two tiers: class filming / concept visual) ---- */
 (function () {
+  const tabs = document.querySelectorAll(".calc__tab");
+  const tierFields = document.querySelectorAll("[data-tier-fields]");
   const btsToggle = document.getElementById("btsToggle");
+  const extraHoursInput = document.getElementById("extraHoursInput");
+  const revisionsInput = document.getElementById("revisionsInput");
+  const reschedulesInput = document.getElementById("reschedulesInput");
   const zoneInputs = document.querySelectorAll('input[name="zone"]');
   const milesWrap = document.getElementById("milesWrap");
   const milesInput = document.getElementById("milesInput");
+  const basePriceEl = document.getElementById("calcBasePrice");
+  const baseNoteEl = document.getElementById("calcBaseNote");
   const linesEl = document.getElementById("calcLines");
   const totalEl = document.getElementById("calcTotal");
   const bookBtn = document.getElementById("bookBtn");
   const toastEl = document.getElementById("calcToast");
-  if (!btsToggle || !linesEl || !totalEl) return;
+  if (!linesEl || !totalEl) return;
 
-  const BASE = 180;
-  const BTS = 60;
   const RATE_PER_MILE = 0.7;
 
-  let state = { zone: "local", miles: 0, bts: false, total: BASE };
+  const TIERS = {
+    class: { base: 180, note: "Class filming, one visual concept", bts: 60 },
+    concept: {
+      base: 280,
+      note: "Concept visual, 2-hour session",
+      extraHour: 80,
+      freeRevisions: 2,
+      revisionRate: 80,
+      freeReschedules: 2,
+      rescheduleRate: 50,
+    },
+  };
+
+  let tier = "class";
+  let state = { zone: "local", miles: 0, total: TIERS.class.base };
 
   function currentZone() {
     return [...zoneInputs].find((r) => r.checked)?.value || "local";
   }
 
+  function setTier(next) {
+    tier = next;
+    tabs.forEach((tab) => {
+      const isActive = tab.dataset.tier === tier;
+      tab.classList.toggle("is-active", isActive);
+      tab.setAttribute("aria-selected", String(isActive));
+    });
+    tierFields.forEach((el) => (el.hidden = el.dataset.tierFields !== tier));
+    basePriceEl.textContent = `$${TIERS[tier].base}`;
+    baseNoteEl.textContent = TIERS[tier].note;
+    recalc();
+  }
+
   function recalc() {
     const zone = currentZone();
     milesWrap.hidden = zone !== "other";
-
-    const lines = [`Class filming <b>$${BASE}</b>`];
-    let total = BASE;
-    let travelFee = 0;
     const miles = Math.max(0, Number(milesInput.value) || 0);
+    const config = TIERS[tier];
 
-    if (btsToggle.checked) {
-      lines.push(`BTS coverage <b>+$${BTS}</b>`);
-      total += BTS;
+    const lines = [];
+    let total = config.base;
+
+    if (tier === "class") {
+      lines.push(`Class filming <b>$${config.base}</b>`);
+      if (btsToggle.checked) {
+        lines.push(`BTS coverage <b>+$${config.bts}</b>`);
+        total += config.bts;
+      }
+    } else {
+      lines.push(`Concept visual, 2 hrs <b>$${config.base}</b>`);
+      const extraHours = Math.max(0, Math.round(Number(extraHoursInput.value) || 0));
+      const revisions = Math.max(0, Math.round(Number(revisionsInput.value) || 0));
+      const reschedules = Math.max(0, Math.round(Number(reschedulesInput.value) || 0));
+
+      if (extraHours > 0) {
+        const fee = extraHours * config.extraHour;
+        lines.push(`+${extraHours} extra hr${extraHours > 1 ? "s" : ""} <b>+$${fee}</b>`);
+        total += fee;
+      }
+      const billedRevisions = Math.max(0, revisions - config.freeRevisions);
+      if (revisions > 0) {
+        const fee = billedRevisions * config.revisionRate;
+        lines.push(
+          `${revisions} revision${revisions > 1 ? "s" : ""} (${Math.min(revisions, config.freeRevisions)} free) <b>${fee ? `+$${fee}` : "$0"}</b>`
+        );
+        total += fee;
+      }
+      const billedReschedules = Math.max(0, reschedules - config.freeReschedules);
+      if (reschedules > 0) {
+        const fee = billedReschedules * config.rescheduleRate;
+        lines.push(
+          `${reschedules} reschedule${reschedules > 1 ? "s" : ""} (${Math.min(reschedules, config.freeReschedules)} free) <b>${fee ? `+$${fee}` : "$0"}</b>`
+        );
+        total += fee;
+      }
     }
 
+    let travelFee = 0;
     if (zone === "other") {
       travelFee = Math.round(miles * 2 * RATE_PER_MILE);
       lines.push(`Travel, ${miles} mi roundtrip <b>+$${travelFee}</b>`);
@@ -153,10 +216,22 @@ styleCards.forEach((card) => {
     linesEl.innerHTML = lines.map((l) => `<span>${l}</span>`).join("");
     totalEl.textContent = `$${total}`;
 
-    state = { zone, miles, bts: btsToggle.checked, total };
+    state = {
+      zone,
+      miles,
+      total,
+      bts: btsToggle.checked,
+      extraHours: Number(extraHoursInput?.value) || 0,
+      revisions: Number(revisionsInput?.value) || 0,
+      reschedules: Number(reschedulesInput?.value) || 0,
+    };
   }
 
-  btsToggle.addEventListener("change", recalc);
+  tabs.forEach((tab) => tab.addEventListener("click", () => setTier(tab.dataset.tier)));
+  btsToggle?.addEventListener("change", recalc);
+  extraHoursInput?.addEventListener("input", recalc);
+  revisionsInput?.addEventListener("input", recalc);
+  reschedulesInput?.addEventListener("input", recalc);
   zoneInputs.forEach((r) => r.addEventListener("change", recalc));
   milesInput?.addEventListener("input", recalc);
   recalc();
@@ -197,13 +272,22 @@ styleCards.forEach((card) => {
         ? `Location: about ${state.miles} mi from Hayward (+$${Math.round(state.miles * 2 * RATE_PER_MILE)} travel)`
         : "Location: Hayward, Fremont, or San Jose (no travel fee)";
 
-    const summary = [
-      "Hi Sean! I'd like to book a class filming session.",
-      `Base rate: $${BASE}`,
-      state.bts ? `BTS coverage: yes (+$${BTS})` : "BTS coverage: no",
-      locationLine,
-      `Estimated total: $${state.total}`,
-    ].join("\n");
+    const lines =
+      tier === "class"
+        ? [
+            "Hi Sean! I'd like to book a class filming session.",
+            `Base rate: $${TIERS.class.base}`,
+            state.bts ? `BTS coverage: yes (+$${TIERS.class.bts})` : "BTS coverage: no",
+          ]
+        : [
+            "Hi Sean! I'd like to book a concept visual session.",
+            `Base rate: $${TIERS.concept.base} (2 hrs)`,
+            state.extraHours > 0 ? `Extra hours: ${state.extraHours}` : "Extra hours: none",
+            `Revisions: ${state.revisions || 0}`,
+            `Reschedules: ${state.reschedules || 0}`,
+          ];
+
+    const summary = [...lines, locationLine, `Estimated total: $${state.total}`].join("\n");
 
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(summary).then(showToast, () => {

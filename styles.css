@@ -650,6 +650,22 @@ section { position: relative; z-index: 2; }
   padding: 2.2rem;
   background: rgba(15, 15, 35, 0.4);
 }
+.calc__tabs { display: flex; gap: 0.6rem; margin-bottom: 1.8rem; }
+.calc__tab {
+  flex: 1;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--paper-dim);
+  font-family: var(--display);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+.calc__tab:hover { border-color: var(--gold); color: var(--paper); }
+.calc__tab.is-active { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+
 .calc__base { display: flex; flex-direction: column; padding-bottom: 1.8rem; border-bottom: 1px solid var(--line); }
 .calc__base-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3em; color: var(--gold); }
 .calc__base-price {
@@ -688,6 +704,28 @@ section { position: relative; z-index: 2; }
 .calc__toggle-title { font-weight: 600; }
 .calc__toggle-sub { font-size: 0.82rem; color: var(--paper-dim); }
 .calc__toggle-price { font-family: var(--display); font-size: 1.3rem; color: var(--gold-bright); }
+
+.calc__tier[hidden] { display: none; }
+.calc__tier .calc__row:last-child { border-bottom: 0; }
+
+.calc__number { display: flex; align-items: center; gap: 1rem; }
+.calc__number-text { display: flex; flex-direction: column; flex: 1; }
+.calc__number-title { font-weight: 600; }
+.calc__number-sub { font-size: 0.82rem; color: var(--paper-dim); }
+.calc__number-price { font-family: var(--display); font-size: 1rem; color: var(--gold-bright); white-space: nowrap; }
+.calc__number input[type="number"] {
+  width: 64px;
+  flex-shrink: 0;
+  padding: 0.5rem 0.4rem;
+  background: rgba(248, 250, 252, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--paper);
+  font-family: var(--body);
+  font-size: 1rem;
+  text-align: center;
+}
+.calc__number input[type="number"]:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
 
 .calc__zone { border: 0; padding: 1.6rem 0; border-bottom: 1px solid var(--line); }
 .calc__zone legend { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3em; color: var(--gold); padding-bottom: 0.9rem; }

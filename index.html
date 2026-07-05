@@ -350,28 +350,68 @@
     <!-- ============ PRICING ============ -->
     <section class="pricing" id="pricing">
       <div class="section-head">
-        <h2 class="section-head__title" data-title>CLASS FILMING<br><em>RATES</em></h2>
+        <h2 class="section-head__title" data-title>SESSION<br><em>RATES</em></h2>
         <p class="section-head__note" data-reveal>Cinematic visuals. Purpose driven. Built for dancers.</p>
       </div>
 
       <div class="pricing__layout">
         <div class="calc" data-reveal>
-          <div class="calc__base">
-            <span class="calc__base-label">FLAT RATE</span>
-            <span class="calc__base-price">$180</span>
-            <span class="calc__base-note">Class filming, one visual concept</span>
+          <div class="calc__tabs" role="tablist">
+            <button type="button" class="calc__tab is-active" id="tabClass" role="tab" aria-selected="true" data-tier="class">CLASS FILMING</button>
+            <button type="button" class="calc__tab" id="tabConcept" role="tab" aria-selected="false" data-tier="concept">CONCEPT VISUAL</button>
           </div>
 
-          <div class="calc__row">
-            <label class="calc__toggle">
-              <input type="checkbox" id="btsToggle">
-              <span class="calc__toggle-track" aria-hidden="true"></span>
-              <span class="calc__toggle-text">
-                <span class="calc__toggle-title">Add BTS coverage</span>
-                <span class="calc__toggle-sub">Behind-the-scenes footage of the shoot</span>
-              </span>
-              <span class="calc__toggle-price">+$60</span>
-            </label>
+          <div class="calc__base">
+            <span class="calc__base-label">FLAT RATE</span>
+            <span class="calc__base-price" id="calcBasePrice">$180</span>
+            <span class="calc__base-note" id="calcBaseNote">Class filming, one visual concept</span>
+          </div>
+
+          <div class="calc__tier" data-tier-fields="class">
+            <div class="calc__row">
+              <label class="calc__toggle">
+                <input type="checkbox" id="btsToggle">
+                <span class="calc__toggle-track" aria-hidden="true"></span>
+                <span class="calc__toggle-text">
+                  <span class="calc__toggle-title">Add BTS coverage</span>
+                  <span class="calc__toggle-sub">Behind-the-scenes footage of the shoot</span>
+                </span>
+                <span class="calc__toggle-price">+$60</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="calc__tier" data-tier-fields="concept" hidden>
+            <div class="calc__row">
+              <label class="calc__number">
+                <span class="calc__number-text">
+                  <span class="calc__number-title">Extra hours</span>
+                  <span class="calc__number-sub">Beyond the included 2-hour session</span>
+                </span>
+                <span class="calc__number-price">+$80/hr</span>
+                <input type="number" id="extraHoursInput" min="0" step="1" value="0" inputmode="numeric" aria-label="Extra hours">
+              </label>
+            </div>
+            <div class="calc__row">
+              <label class="calc__number">
+                <span class="calc__number-text">
+                  <span class="calc__number-title">Revisions</span>
+                  <span class="calc__number-sub">First 2 free</span>
+                </span>
+                <span class="calc__number-price">+$80 ea. after</span>
+                <input type="number" id="revisionsInput" min="0" step="1" value="0" inputmode="numeric" aria-label="Revisions requested">
+              </label>
+            </div>
+            <div class="calc__row">
+              <label class="calc__number">
+                <span class="calc__number-text">
+                  <span class="calc__number-title">Reschedules</span>
+                  <span class="calc__number-sub">First 2 free</span>
+                </span>
+                <span class="calc__number-price">+$50 ea. after</span>
+                <input type="number" id="reschedulesInput" min="0" step="1" value="0" inputmode="numeric" aria-label="Reschedules needed">
+              </label>
+            </div>
           </div>
 
           <fieldset class="calc__zone">
