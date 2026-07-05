@@ -114,11 +114,15 @@ styleCards.forEach((card) => {
   const milesInput = document.getElementById("milesInput");
   const linesEl = document.getElementById("calcLines");
   const totalEl = document.getElementById("calcTotal");
+  const bookBtn = document.getElementById("bookBtn");
+  const toastEl = document.getElementById("calcToast");
   if (!btsToggle || !linesEl || !totalEl) return;
 
   const BASE = 180;
   const BTS = 60;
   const RATE_PER_MILE = 0.7;
+
+  let state = { zone: "local", miles: 0, bts: false, total: BASE };
 
   function currentZone() {
     return [...zoneInputs].find((r) => r.checked)?.value || "local";
@@ -130,6 +134,8 @@ styleCards.forEach((card) => {
 
     const lines = [`Class filming <b>$${BASE}</b>`];
     let total = BASE;
+    let travelFee = 0;
+    const miles = Math.max(0, Number(milesInput.value) || 0);
 
     if (btsToggle.checked) {
       lines.push(`BTS coverage <b>+$${BTS}</b>`);
@@ -137,8 +143,7 @@ styleCards.forEach((card) => {
     }
 
     if (zone === "other") {
-      const miles = Math.max(0, Number(milesInput.value) || 0);
-      const travelFee = Math.round(miles * 2 * RATE_PER_MILE);
+      travelFee = Math.round(miles * 2 * RATE_PER_MILE);
       lines.push(`Travel, ${miles} mi roundtrip <b>+$${travelFee}</b>`);
       total += travelFee;
     } else {
@@ -147,12 +152,63 @@ styleCards.forEach((card) => {
 
     linesEl.innerHTML = lines.map((l) => `<span>${l}</span>`).join("");
     totalEl.textContent = `$${total}`;
+
+    state = { zone, miles, bts: btsToggle.checked, total };
   }
 
   btsToggle.addEventListener("change", recalc);
   zoneInputs.forEach((r) => r.addEventListener("change", recalc));
   milesInput?.addEventListener("input", recalc);
   recalc();
+
+  /* Copy a ready-to-send booking summary, then let the DM link open as normal */
+  function showToast() {
+    if (!toastEl) return;
+    toastEl.textContent = "Copied. Paste it into the chat.";
+    toastEl.classList.add("is-visible");
+    clearTimeout(toastEl._hideTimer);
+    toastEl._hideTimer = setTimeout(() => toastEl.classList.remove("is-visible"), 4000);
+  }
+
+  function legacyCopy(text) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+
+  bookBtn?.addEventListener("click", () => {
+    const locationLine =
+      state.zone === "other"
+        ? `Location: about ${state.miles} mi from Hayward (+$${Math.round(state.miles * 2 * RATE_PER_MILE)} travel)`
+        : "Location: Hayward, Fremont, or San Jose (no travel fee)";
+
+    const summary = [
+      "Hi Sean! I'd like to book a class filming session.",
+      `Base rate: $${BASE}`,
+      state.bts ? `BTS coverage: yes (+$${BTS})` : "BTS coverage: no",
+      locationLine,
+      `Estimated total: $${state.total}`,
+    ].join("\n");
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(summary).then(showToast, () => {
+        if (legacyCopy(summary)) showToast();
+      });
+    } else if (legacyCopy(summary)) {
+      showToast();
+    }
+  });
 })();
 
 const preloader = document.getElementById("preloader");

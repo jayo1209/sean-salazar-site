@@ -730,7 +730,19 @@ section { position: relative; z-index: 2; }
 .calc__total-sum span:first-child { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.25em; color: var(--paper-dim); }
 .calc__total-amount { font-family: var(--display); font-size: clamp(2.2rem, 4vw, 3rem); color: var(--gold-bright); }
 .calc__cta { display: block; text-align: center; width: 100%; margin-top: 1.4rem; }
-.calc__disclaimer { margin-top: 0.9rem; font-size: 0.76rem; color: var(--paper-dim); text-align: center; }
+.calc__toast {
+  margin-top: 0.9rem;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gold-bright);
+  min-height: 1.2em;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.35s ease, transform 0.35s var(--ease-out);
+}
+.calc__toast.is-visible { opacity: 1; transform: translateY(0); }
+.calc__disclaimer { margin-top: 0.4rem; font-size: 0.76rem; color: var(--paper-dim); text-align: center; }
 
 .reasons {
   list-style: none;
